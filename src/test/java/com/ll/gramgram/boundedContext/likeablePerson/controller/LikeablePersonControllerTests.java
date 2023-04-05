@@ -179,4 +179,25 @@ public class LikeablePersonControllerTests {
 
         Assertions.assertThat(likeablePerson).isNull();
     }
+    @Test
+    @DisplayName("권한 없는 LikeablePerson 제거")
+    @WithUserDetails("user3")
+    void t007() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(get("/likeablePerson/delete/1")
+                        .with(csrf()) // CSRF 키 생성
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("delete"))
+                .andExpect(status().is2xxSuccessful());
+        ;
+        LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);
+
+        Assertions.assertThat(likeablePerson).isNotNull(); // 삭제가 안되어야 정상흐름
+    }
 }
