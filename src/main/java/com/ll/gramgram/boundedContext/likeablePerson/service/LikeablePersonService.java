@@ -52,6 +52,13 @@ public class LikeablePersonService {
     @Transactional
     public RsData<String> delete(Member member, Long deleteId) {
         LikeablePerson likeablePerson = likeablePersonRepository.findById(deleteId).orElse(null);
+
+        if (!(likeablePerson.getFromInstaMemberUsername().equals(member.getInstaMember().getUsername()))){
+            // 현재 로그인된 멤버의 인스타아이디가 likeablePerson의 from(호감을 표시한 본인)이 아닐 때
+            return RsData.of("F-1", "삭제 권한이 없습니다".formatted(likeablePerson.getToInstaMemberUsername()));
+        }
+
+
         likeablePersonRepository.delete(likeablePerson);
 
 
