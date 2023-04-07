@@ -67,12 +67,12 @@ public class LikeablePersonController {
         Optional<LikeablePerson> opLikeablePerson = likeablePersonRepository.findById(deleteId);
 
         if (opLikeablePerson.isEmpty())
-            return rq.redirectWithMsg("/likeablePerson/list", "해당 데이터는 존재하지 않습니다.");
+            return rq.historyBack( "해당 데이터는 이미 삭제되었습니다.");
 
         LikeablePerson likeablePerson = opLikeablePerson.get();
 
         if (!(likeablePerson.getFromInstaMember().getId().equals(rq.getMember().getInstaMember().getId())))           // 현재 로그인된 멤버의 인스타아이디가 likeablePerson의 from(호감을 표시한 본인)이 아닐 때
-            return rq.redirectWithMsg("/likeablePerson/list", "삭제 권한이 없습니다".formatted(likeablePerson.getToInstaMemberUsername()));
+            return rq.historyBack( "%s는 삭제 권한이 없습니다".formatted(likeablePerson.getToInstaMemberUsername()));
 
 
         RsData<String> deleteRsData = likeablePersonService.delete(likeablePerson);
