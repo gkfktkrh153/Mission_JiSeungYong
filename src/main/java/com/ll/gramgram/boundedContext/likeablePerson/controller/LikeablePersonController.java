@@ -62,7 +62,7 @@ public class LikeablePersonController {
     }
 
     @PreAuthorize("isAuthenticated()")
-    @GetMapping("/delete/{likeablePersonId}")
+    @DeleteMapping("/{likeablePersonId}")
     public String delete(@PathVariable("likeablePersonId") Long deleteId){
         Optional<LikeablePerson> opLikeablePerson = likeablePersonRepository.findById(deleteId);
 
