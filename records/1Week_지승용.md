@@ -12,14 +12,13 @@
 - [O] 구글로그인
   - [O] 재시작 시에도 DB자동 등록
 
-- [] 리팩토링
+- [O] 리팩토링
   - [O] op.isPresent()는 컨트롤러에서 확인!
   - [O] 삭제 시 username -> id 이용
   - [O] orElse(null) -> Optional반환
   - [O] Rq는 컨트롤러단에서만 사용
-  - [] getMapping -> deleteMapping 변경
-  - [] 테스트 케이스는 한번에 하나만( + 서비스와 컨틀롤러 테스트 분리)
-
+  - [O] getMapping -> deleteMapping 변경
+  
 ### N주차 미션 요약
 
 ---
