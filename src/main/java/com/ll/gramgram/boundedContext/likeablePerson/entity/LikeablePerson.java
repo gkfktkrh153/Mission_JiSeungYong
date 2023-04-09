@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.likeablePerson.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import jakarta.persistence.*;
 import lombok.*;
@@ -28,9 +29,13 @@ public class LikeablePerson {
     private LocalDateTime modifyDate;
 
     @ManyToOne
+    @ToString.Exclude
+    @JsonIgnore
     private InstaMember fromInstaMember; // 호감을 표시한 사람(인스타 멤버)
     private String fromInstaMemberUsername; // 혹시 몰라서 기록
     @ManyToOne
+    @ToString.Exclude
+    @JsonIgnore
     private InstaMember toInstaMember; // 호감을 받은 사람(인스타 멤버)
     private String toInstaMemberUsername; // 혹시 몰라서 기록
     private int attractiveTypeCode; // 매력포인트(1=외모, 2=성격, 3=능력)
