@@ -53,6 +53,15 @@ public class LikeablePersonService {
         return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
     }
 
+    public RsData<Object> canDelete(Member actor, LikeablePerson likeablePerson) {
+        if(likeablePerson == null) return RsData.of("F-1", "이미 삭제되었습니다.");
+
+
+        if (!(likeablePerson.getFromInstaMember().getId().equals(actor.getInstaMember().getId())))           // 현재 로그인된 멤버의 인스타아이디가 likeablePerson의 from(호감을 표시한 본인)이 아닐 때
+            return RsData.of( "F-2", "%s는 삭제 권한이 없습니다".formatted(likeablePerson.getToInstaMemberUsername()));
+
+        return RsData.of("S-1", "삭제가능합니다");
+    }
     @Transactional
     public RsData<String> delete(LikeablePerson likeablePerson) {
 
