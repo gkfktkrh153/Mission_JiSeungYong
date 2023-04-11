@@ -40,9 +40,11 @@ public class LikeablePerson {
     @JsonIgnore
     private InstaMember toInstaMember; // 호감을 받은 사람(인스타 멤버)
     private String toInstaMemberUsername; // 혹시 몰라서 기록
+    @Setter
     private int attractiveTypeCode; // 매력포인트(1=외모, 2=성격, 3=능력)
 
-    public String getAttractiveTypeDisplayName() {
+
+    public String getAttractiveTypeDisplayName() { // usr.likeablePerson.list.html 에서 사용됨!
         return switch (attractiveTypeCode) {
             case 1 -> "외모";
             case 2 -> "성격";

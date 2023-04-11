@@ -31,19 +31,23 @@ public class LikeablePersonService {
         InstaMember fromInstaMember = member.getInstaMember();
 
         List<LikeablePerson> likes = likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(fromInstaMember.getId(), toInstaMember.getId());
-        if (!likes.isEmpty())  // 이전에 상대방에게 호감을 표시한 경우
-            return RsData.of("F-3", "같은 사유로 동일한 대상에게 호감을 표현할 수 없습니다");
-
+        
+        if (!likes.isEmpty()) {// 이전에 상대방에게 호감을 표시한 경우
+            LikeablePerson likeablePerson = likes.get(0);
+            int priorAttractiveTypeCode = likeablePerson.getAttractiveTypeCode();
+            if (attractiveTypeCode == priorAttractiveTypeCode)  // 호감 표현 사유가 이전과 동일
+                return RsData.of("F-3", "같은 사유로 동일한 대상에게 호감을 표현할 수 없습니다");
+            likeablePerson.setAttractiveTypeCode(attractiveTypeCode); // 사유 변경
+            return RsData.of("S-1", "입력하신 인스타유저(%s)에 대한 호감사유를 %s에서 %s로 변경했습니다.".formatted(username, getAttractiveTypeDisplayName(priorAttractiveTypeCode), getAttractiveTypeDisplayName(attractiveTypeCode)),likeablePerson);
+        }
+        
         LikeablePerson likeablePerson = buildLikeablePerson(fromInstaMember, toInstaMember, attractiveTypeCode);
-
-
         likeablePersonRepository.save(likeablePerson); // 저장
-
 
         fromInstaMember.addFromLikeablePerson(likeablePerson);
         toInstaMember.addToLikeablePerson(likeablePerson);
 
-        return RsData.of("S-1", "입력하신 인스타유저(%s)를 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
+        return RsData.of("S-2", "입력하신 인스타유저(%s)를 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
     }
 
     private LikeablePerson buildLikeablePerson(InstaMember fromInstaMember, InstaMember toInstaMember, int attractiveTypeCode) {
@@ -57,7 +61,13 @@ public class LikeablePersonService {
                 .build();
     }
 
-
+    public String getAttractiveTypeDisplayName(int attractiveTypeCode) {
+        return switch (attractiveTypeCode) {
+            case 1 -> "외모";
+            case 2 -> "성격";
+            default -> "능력";
+        };
+    }
     public RsData<Object> canDelete(Member actor, LikeablePerson likeablePerson) {
         if(likeablePerson == null) return RsData.of("F-1", "이미 삭제되었습니다.");
 
