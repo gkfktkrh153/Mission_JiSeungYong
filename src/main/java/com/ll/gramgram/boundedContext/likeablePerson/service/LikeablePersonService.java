@@ -30,12 +30,13 @@ public class LikeablePersonService {
         }
 
         InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
+        InstaMember fromInstaMember = member.getInstaMember();
 
-        LikeablePerson likeablePerson = buildLikeablePerson(member, toInstaMember, attractiveTypeCode);
+        LikeablePerson likeablePerson = buildLikeablePerson(fromInstaMember, toInstaMember, attractiveTypeCode);
 
 
         likeablePersonRepository.save(likeablePerson); // 저장
-        InstaMember fromInstaMember = member.getInstaMember();
+
 
         fromInstaMember.addFromLikeablePerson(likeablePerson);
         toInstaMember.addToLikeablePerson(likeablePerson);
@@ -43,11 +44,11 @@ public class LikeablePersonService {
         return RsData.of("S-1", "입력하신 인스타유저(%s)를 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
     }
 
-    private LikeablePerson buildLikeablePerson(Member member, InstaMember toInstaMember, int attractiveTypeCode) {
+    private LikeablePerson buildLikeablePerson(InstaMember fromInstaMember, InstaMember toInstaMember, int attractiveTypeCode) {
         return  LikeablePerson
                 .builder()
-                .fromInstaMember(member.getInstaMember()) // 호감을 표시하는 사람의 인스타 멤버
-                .fromInstaMemberUsername(member.getInstaMember().getUsername()) // 중요하지 않음
+                .fromInstaMember(fromInstaMember) // 호감을 표시하는 사람의 인스타 멤버
+                .fromInstaMemberUsername(fromInstaMember.getUsername()) // 중요하지 않음
                 .toInstaMember(toInstaMember) // 호감을 받는 사람의 인스타 멤버
                 .toInstaMemberUsername(toInstaMember.getUsername()) // 중요하지 않음
                 .attractiveTypeCode(attractiveTypeCode) // 1=외모, 2=능력, 3=성격
