@@ -21,16 +21,18 @@ public class LikeablePersonService {
 
     @Transactional
     public RsData<LikeablePerson> like(Member member, String username, int attractiveTypeCode) {
-        if ( member.hasConnectedInstaMember() == false ) {
-            return RsData.of("F-2", "먼저 본인의 인스타그램 아이디를 입력해야 합니다.");
-        }
 
-        if (member.getInstaMember().getUsername().equals(username)) {
-            return RsData.of("F-1", "본인을 호감상대로 등록할 수 없습니다.");
-        }
+        if ( member.hasConnectedInstaMember() == false )
+            return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해야 합니다.");
+        if (member.getInstaMember().getUsername().equals(username))
+            return RsData.of("F-2", "본인을 호감상대로 등록할 수 없습니다.");
 
         InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
         InstaMember fromInstaMember = member.getInstaMember();
+
+        List<LikeablePerson> likes = likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(fromInstaMember.getId(), toInstaMember.getId());
+        if (!likes.isEmpty())  // 이전에 상대방에게 호감을 표시한 경우
+            return RsData.of("F-3", "같은 사유로 동일한 대상에게 호감을 표현할 수 없습니다");
 
         LikeablePerson likeablePerson = buildLikeablePerson(fromInstaMember, toInstaMember, attractiveTypeCode);
 
@@ -55,9 +57,6 @@ public class LikeablePersonService {
                 .build();
     }
 
-    public List<LikeablePerson> findByFromInstaMemberId(Long fromInstaMemberId) {
-        return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
-    }
 
     public RsData<Object> canDelete(Member actor, LikeablePerson likeablePerson) {
         if(likeablePerson == null) return RsData.of("F-1", "이미 삭제되었습니다.");
