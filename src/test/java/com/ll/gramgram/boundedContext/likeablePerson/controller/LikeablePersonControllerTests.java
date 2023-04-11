@@ -222,4 +222,27 @@ public class LikeablePersonControllerTests {
 
         Assertions.assertThat(likeablePerson).isNotNull(); // 삭제가 안되어야 정상흐름
     }
+    @Test
+    @DisplayName("다른 사유로 호감 표시(user2 -> user3)")
+    @WithUserDetails("user2")
+    void t009() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user3")
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is3xxRedirection());
+        ;
+        LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);
+
+        Assertions.assertThat(likeablePerson.getAttractiveTypeCode()).isEqualTo(3); //
+    }
 }
