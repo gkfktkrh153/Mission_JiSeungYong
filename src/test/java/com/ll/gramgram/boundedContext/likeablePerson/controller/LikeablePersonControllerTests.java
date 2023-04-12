@@ -222,7 +222,7 @@ public class LikeablePersonControllerTests {
         ;
         LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);
 
-        Assertions.assertThat(likeablePerson).isNotNull(); // 삭제가 안되어야 정상흐름
+        Assertions.assertThat(likeablePerson.getAttractiveTypeCode()).isEqualTo(1); // 사유변경 X
     }
     @Test
     @DisplayName("다른 사유로 호감 표시(user2 -> user3)")
