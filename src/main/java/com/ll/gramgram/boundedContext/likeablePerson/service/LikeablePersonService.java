@@ -7,6 +7,7 @@ import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,6 +19,8 @@ import java.util.List;
 public class LikeablePersonService {
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
+    @Value("${MAX_COUNT_LIKEABLE_PERSON}")
+    private Long MAX_COUNT_LIKEABLE_PERSON;
 
     @Transactional
     public RsData<LikeablePerson> like(Member member, String username, int attractiveTypeCode) {
@@ -40,11 +43,15 @@ public class LikeablePersonService {
             likeablePerson.setAttractiveTypeCode(attractiveTypeCode); // 사유 변경
             return RsData.of("S-1", "입력하신 인스타유저(%s)에 대한 호감사유를 %s에서 %s로 변경했습니다.".formatted(username, getAttractiveTypeDisplayName(priorAttractiveTypeCode), getAttractiveTypeDisplayName(attractiveTypeCode)),likeablePerson);
         }
-        
+        int countOfLikeablePerson = likeablePersonRepository.findByFromInstaMemberId(fromInstaMember.getId()).size();
+
+        if (countOfLikeablePerson >= MAX_COUNT_LIKEABLE_PERSON)
+            return RsData.of("F-4", "10명 이상의 대상에게 호감을 표시할 수 없습니다.");
+
         LikeablePerson likeablePerson = buildLikeablePerson(fromInstaMember, toInstaMember, attractiveTypeCode);
         likeablePersonRepository.save(likeablePerson); // 저장
 
-        fromInstaMember.addFromLikeablePerson(likeablePerson);
+        fromInstaMember.addFromLikeablePerson(likeablePerson); // 양방향 연관관계 설정
         toInstaMember.addToLikeablePerson(likeablePerson);
 
         return RsData.of("S-2", "입력하신 인스타유저(%s)를 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
