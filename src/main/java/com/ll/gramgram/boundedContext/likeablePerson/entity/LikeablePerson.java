@@ -52,5 +52,7 @@ public class LikeablePerson {
         };
     }
 
-
+    public void changeAttractiveType(int attractiveTypeCode) {
+        this.attractiveTypeCode = attractiveTypeCode;
+    }
 }

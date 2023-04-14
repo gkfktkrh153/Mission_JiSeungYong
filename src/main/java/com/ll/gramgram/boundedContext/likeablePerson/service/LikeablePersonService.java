@@ -23,39 +23,57 @@ public class LikeablePersonService {
     private Long MAX_COUNT_LIKEABLE_PERSON;
 
     @Transactional
-    public RsData<LikeablePerson> like(Member member, String username, int attractiveTypeCode) {
+    public RsData<LikeablePerson> like(Member actor, String username, int attractiveTypeCode) {
+        InstaMember toLikeInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
 
-        if ( member.hasConnectedInstaMember() == false )
-            return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해야 합니다.");
-        if (member.getInstaMember().getUsername().equals(username))
+        RsData canLikeRsData = canLike(actor, toLikeInstaMember, attractiveTypeCode);
+
+        if (canLikeRsData.isFail()) return canLikeRsData;
+
+        if (canLikeRsData.getResultCode().equals("S-1")) {// 호감 사유 변경이 가능할 때!
+            ((LikeablePerson) canLikeRsData.getData()) // "S-1" 일 때는 변경할 likeablePerson 객체가 리턴됨
+                    .changeAttractiveType(attractiveTypeCode);
+            return canLikeRsData;
+        }
+
+        InstaMember fromLikeInstaMember = (InstaMember) canLikeRsData.getData(); //
+
+        LikeablePerson likeablePerson = buildLikeablePerson(fromLikeInstaMember, toLikeInstaMember, attractiveTypeCode);
+        likeablePersonRepository.save(likeablePerson); // 저장
+
+        fromLikeInstaMember.addFromLikeablePerson(likeablePerson); // 양방향 연관관계 설정
+        toLikeInstaMember.addToLikeablePerson(likeablePerson);
+
+        return RsData.of("S-3", "입력하신 인스타유저(%s)를 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
+    }
+
+    private RsData canLike(Member actor, InstaMember toLikeInstaMember, int attractiveTypeCode) {
+        if (!actor.hasConnectedInstaMember()) {
+            return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해주세요.");
+        }
+
+        if (actor.getInstaMember().getUsername().equals(toLikeInstaMember.getUsername()))
             return RsData.of("F-2", "본인을 호감상대로 등록할 수 없습니다.");
 
-        InstaMember toInstaMember = instaMemberService.findByUsernameOrCreate(username).getData();
-        InstaMember fromInstaMember = member.getInstaMember();
 
-        List<LikeablePerson> likes = likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(fromInstaMember.getId(), toInstaMember.getId());
-        
+        InstaMember fromLikeInstaMember = actor.getInstaMember();
+
+        List<LikeablePerson> likes = likeablePersonRepository.findByFromInstaMemberIdAndToInstaMemberId(fromLikeInstaMember.getId(), toLikeInstaMember.getId());
+
         if (!likes.isEmpty()) {// 이전에 상대방에게 호감을 표시한 경우
             LikeablePerson likeablePerson = likes.get(0);
             int priorAttractiveTypeCode = likeablePerson.getAttractiveTypeCode();
             if (attractiveTypeCode == priorAttractiveTypeCode)  // 호감 표현 사유가 이전과 동일
                 return RsData.of("F-3", "같은 사유로 동일한 대상에게 호감을 표현할 수 없습니다");
-            likeablePerson.setAttractiveTypeCode(attractiveTypeCode); // 사유 변경
-            return RsData.of("S-1", "입력하신 인스타유저(%s)에 대한 호감사유를 %s에서 %s로 변경했습니다.".formatted(username, getAttractiveTypeDisplayName(priorAttractiveTypeCode), getAttractiveTypeDisplayName(attractiveTypeCode)),likeablePerson);
+            return RsData.of("S-1", "입력하신 인스타유저(%s)에 대한 호감사유를 %s에서 %s로 변경합니다.".formatted(toLikeInstaMember.getUsername(), getAttractiveTypeDisplayName(priorAttractiveTypeCode), getAttractiveTypeDisplayName(attractiveTypeCode)),likeablePerson);
         }
-        int countOfLikeablePerson = likeablePersonRepository.findByFromInstaMemberId(fromInstaMember.getId()).size();
+        int countOfLikeablePerson = likeablePersonRepository.findByFromInstaMemberId(fromLikeInstaMember.getId()).size();
 
         if (countOfLikeablePerson >= MAX_COUNT_LIKEABLE_PERSON)
             return RsData.of("F-4", "10명 이상의 대상에게 호감을 표시할 수 없습니다.");
-
-        LikeablePerson likeablePerson = buildLikeablePerson(fromInstaMember, toInstaMember, attractiveTypeCode);
-        likeablePersonRepository.save(likeablePerson); // 저장
-
-        fromInstaMember.addFromLikeablePerson(likeablePerson); // 양방향 연관관계 설정
-        toInstaMember.addToLikeablePerson(likeablePerson);
-
-        return RsData.of("S-2", "입력하신 인스타유저(%s)를 호감상대로 등록되었습니다.".formatted(username), likeablePerson);
+        return RsData.of("S-2", "호감표시가 가능합니다.", fromLikeInstaMember);
     }
+
 
     private LikeablePerson buildLikeablePerson(InstaMember fromInstaMember, InstaMember toInstaMember, int attractiveTypeCode) {
         return  LikeablePerson
