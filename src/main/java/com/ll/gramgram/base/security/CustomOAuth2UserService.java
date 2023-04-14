@@ -16,6 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collection;
 import java.util.Map;
 
+import static org.hibernate.Hibernate.map;
+
 @Service
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
@@ -32,6 +34,12 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         String oauthId = oAuth2User.getName();
 
         String providerTypeCode = userRequest.getClientRegistration().getRegistrationId().toUpperCase();
+        if (providerTypeCode.equals("NAVER"))
+        {
+            Map response = (Map) oAuth2User.getAttribute("response");
+            oauthId = response.get("id").toString();
+
+        }
 
         String username = providerTypeCode + "__%s".formatted(oauthId);
 

@@ -17,6 +17,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -198,5 +200,99 @@ public class LikeablePersonControllerTests {
         LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);
 
         Assertions.assertThat(likeablePerson).isNotNull(); // 삭제가 안되어야 정상흐름
+    }
+    @Test
+    @DisplayName("같은 사유로 호감 표시(user2 -> user3)")
+    @WithUserDetails("user2")
+    void t008() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user3")
+                        .param("attractiveTypeCode", "1")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is4xxClientError());
+        ;
+        LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);
+
+        Assertions.assertThat(likeablePerson.getAttractiveTypeCode()).isEqualTo(1); // 사유변경 X
+    }
+    @Test
+    @DisplayName("다른 사유로 호감 표시(user2 -> user3)")
+    @WithUserDetails("user2")
+    void t009() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user3")
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is3xxRedirection());
+        ;
+        LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);
+
+        Assertions.assertThat(likeablePerson.getAttractiveTypeCode()).isEqualTo(3); // 사유변경
+    }
+    @Test
+    @DisplayName("10명 이상에게 호감표시")
+    @WithUserDetails("user3")
+    void t10() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user110")
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is4xxClientError());
+        ;
+
+        List<LikeablePerson> likeablePersonList = likeablePersonRepository.findByFromInstaMemberId(2L);
+
+        Assertions.assertThat(likeablePersonList.size()).isEqualTo(10); // 추가 X
+    }
+    @Test
+    @DisplayName("호감표시 10명일 때 사유변경")
+    @WithUserDetails("user3")
+    void t11() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user109")
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is3xxRedirection());
+        ;
+
+        List<LikeablePerson> likeablePersonList = likeablePersonRepository.findByFromInstaMemberId(2L);
+
+        Assertions.assertThat(likeablePersonList.size()).isEqualTo(10); // 추가 X
     }
 }

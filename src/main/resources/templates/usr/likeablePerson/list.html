@@ -17,13 +17,19 @@
 
     <th:block th:if="${@rq.member.hasConnectedInstaMember}">
         <ul>
+            <!-- 내가 좋아하는 사람의 수 -->
+            <span th:text="|내가 좋아하는 사람의 수 : ${#lists.size(@rq.member.instaMember.fromLikeablePerson)}|"></span>
+            <!-- 나를 좋아하는 사람의 수 -->
+            <span th:text="|나를 좋아하는 사람의 수 : ${#lists.size(@rq.member.instaMember.toLikeablePerson)}|"></span>
+
             <li th:each="likeablePerson: ${likeablePeople}">
                 <span class="toInstaMember_username" th:text="${likeablePerson.toInstaMember.username}"></span>
                 <span class="toInstaMember_attractiveTypeDisplayName"
-                      th:text="${likeablePerson.attractiveTypeDisplayName}"></span>
-                <a th:href="@{|/${likeablePerson.id}|}" onclick="return confirm('정말로 삭제하시겠습니까?');">삭제</a>
-                <form hidden th:action = "@{|/${likeablePerson.id}|}" method = "POST">
-                    <input type="hidden" name = "_method" value ="delete">
+                      th:text="${likeablePerson.attractiveTypeDisplayName}">
+                </span>
+                <a href="javascript:;" onclick="if ( confirm('정말로 삭제하시겠습니까?') ) $(this).next().submit();">삭제</a>
+                <form hidden th:action="@{|/likeablePerson/${likeablePerson.id}|}" method="POST">
+                    <input type="hidden" name="_method" value="delete">
                 </form>
             </li>
 
