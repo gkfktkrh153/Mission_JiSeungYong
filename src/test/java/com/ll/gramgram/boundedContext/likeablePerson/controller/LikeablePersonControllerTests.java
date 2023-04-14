@@ -271,4 +271,28 @@ public class LikeablePersonControllerTests {
 
         Assertions.assertThat(likeablePersonList.size()).isEqualTo(10); // 추가 X
     }
+    @Test
+    @DisplayName("호감표시 10명일 때 사유변경")
+    @WithUserDetails("user3")
+    void t11() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/add")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user109")
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("add"))
+                .andExpect(status().is3xxRedirection());
+        ;
+
+        List<LikeablePerson> likeablePersonList = likeablePersonRepository.findByFromInstaMemberId(2L);
+
+        Assertions.assertThat(likeablePersonList.size()).isEqualTo(10); // 추가 X
+    }
 }
