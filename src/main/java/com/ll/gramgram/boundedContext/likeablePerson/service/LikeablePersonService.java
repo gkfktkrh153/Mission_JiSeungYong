@@ -10,8 +10,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.thymeleaf.expression.Lists;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 @Service
 @RequiredArgsConstructor
@@ -36,7 +41,7 @@ public class LikeablePersonService {
             return canLikeRsData;
         }
 
-        InstaMember fromLikeInstaMember = (InstaMember) canLikeRsData.getData(); //
+        InstaMember fromLikeInstaMember = (InstaMember) canLikeRsData.getData(); // 호감을 표현할 수 있음이 검증된 객체
 
         LikeablePerson likeablePerson = buildLikeablePerson(fromLikeInstaMember, toLikeInstaMember, attractiveTypeCode);
         likeablePersonRepository.save(likeablePerson); // 저장
