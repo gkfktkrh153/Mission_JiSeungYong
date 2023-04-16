@@ -1,11 +1,13 @@
 package com.ll.gramgram.boundedContext.likeablePerson.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ll.gramgram.base.baseEntity.BaseEntity;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,21 +16,13 @@ import java.time.LocalDateTime;
 
 import static jakarta.persistence.GenerationType.IDENTITY;
 
-@Builder
+@SuperBuilder
 @NoArgsConstructor
 @AllArgsConstructor
-@EntityListeners(AuditingEntityListener.class)
-@ToString
+@ToString(callSuper = true)
 @Entity
 @Getter
-public class LikeablePerson {
-    @Id
-    @GeneratedValue(strategy = IDENTITY)
-    private Long id;
-    @CreatedDate
-    private LocalDateTime createDate;
-    @LastModifiedDate
-    private LocalDateTime modifyDate;
+public class LikeablePerson extends BaseEntity {
 
     @ManyToOne
     @ToString.Exclude
@@ -52,5 +46,7 @@ public class LikeablePerson {
         };
     }
 
-
+    public void changeAttractiveType(int attractiveTypeCode) {
+        this.attractiveTypeCode = attractiveTypeCode;
+    }
 }
