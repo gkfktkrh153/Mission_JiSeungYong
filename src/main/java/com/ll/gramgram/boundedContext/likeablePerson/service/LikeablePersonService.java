@@ -109,7 +109,10 @@ public class LikeablePersonService {
     @Transactional
     public RsData<String> delete(LikeablePerson likeablePerson) {
 
-
+        // 당신이 생성한 좋아요가 사라졌습니다.
+        likeablePerson.getFromInstaMember().removeFromLikeablePerson(likeablePerson);
+        // 당신이 받은 좋아요가 사라졌습니다
+        likeablePerson.getToInstaMember().removeToLikeablePerson(likeablePerson);
 
         likeablePersonRepository.delete(likeablePerson);
 
