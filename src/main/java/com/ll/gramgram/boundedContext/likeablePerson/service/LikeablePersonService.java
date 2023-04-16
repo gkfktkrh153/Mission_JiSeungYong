@@ -1,5 +1,6 @@
 package com.ll.gramgram.boundedContext.likeablePerson.service;
 
+import com.ll.gramgram.base.appConfig.AppConfig;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
@@ -24,8 +25,6 @@ import java.util.stream.Stream;
 public class LikeablePersonService {
     private final LikeablePersonRepository likeablePersonRepository;
     private final InstaMemberService instaMemberService;
-    @Value("${MAX_COUNT_LIKEABLE_PERSON}")
-    private Long MAX_COUNT_LIKEABLE_PERSON;
 
     @Transactional
     public RsData<LikeablePerson> like(Member actor, String username, int attractiveTypeCode) {
@@ -74,8 +73,8 @@ public class LikeablePersonService {
         }
         int countOfLikeablePerson = likeablePersonRepository.findByFromInstaMemberId(fromLikeInstaMember.getId()).size();
 
-        if (countOfLikeablePerson >= MAX_COUNT_LIKEABLE_PERSON)
-            return RsData.of("F-4", "10명 이상의 대상에게 호감을 표시할 수 없습니다.");
+        if (countOfLikeablePerson >= AppConfig.getFromLikeablePersonMax())
+            return RsData.of("F-4", "%d명 이상의 대상에게 호감을 표시할 수 없습니다.".formatted(AppConfig.getFromLikeablePersonMax()));
         return RsData.of("S-2", "호감표시가 가능합니다.", fromLikeInstaMember);
     }
 
