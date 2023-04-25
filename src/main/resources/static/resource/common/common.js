@@ -43,3 +43,6 @@ function toastWarning(msg) {
         toastr["warning"](pureMsg, "경고");
     }
 }
+function setTimeoutZero(callback) {
+    setTimeout(callback);
+}
