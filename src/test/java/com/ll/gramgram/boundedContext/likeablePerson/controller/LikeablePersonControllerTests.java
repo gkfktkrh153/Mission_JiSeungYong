@@ -264,4 +264,11 @@ public class LikeablePersonControllerTests {
 
         Assertions.assertThat(likeablePersonList.size()).isEqualTo(10); // 추가 X
     }
+    @Test
+    @DisplayName("querydsl test")
+    void t12() {
+        LikeablePerson likeablePerson = likeablePersonRepository.findQslByFromInstaMemberIdAndToInstaMember_username(1L, "insta_user4").orElse(null);
+
+        Assertions.assertThat(likeablePerson.getId()).isEqualTo(2L);
+    }
 }
