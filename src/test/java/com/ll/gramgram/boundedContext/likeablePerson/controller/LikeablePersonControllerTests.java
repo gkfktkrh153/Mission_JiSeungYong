@@ -142,7 +142,7 @@ public class LikeablePersonControllerTests {
         // THEN
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
-                .andExpect(handler().methodName("delete"))
+                .andExpect(handler().methodName("cancel"))
                 .andExpect(status().is3xxRedirection());
         ;
         LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);
@@ -163,7 +163,7 @@ public class LikeablePersonControllerTests {
         // THEN
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
-                .andExpect(handler().methodName("delete"))
+                .andExpect(handler().methodName("cancel"))
                 .andExpect(status().is4xxClientError());
         ;
         LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);

@@ -97,7 +97,7 @@ public class LikeablePersonService {
             default -> "능력";
         };
     }
-    public RsData<Object> canDelete(Member actor, LikeablePerson likeablePerson) {
+    public RsData<Object> canCancel(Member actor, LikeablePerson likeablePerson) {
         if(likeablePerson == null) return RsData.of("F-1", "이미 삭제되었습니다.");
 
 
@@ -107,7 +107,7 @@ public class LikeablePersonService {
         return RsData.of("S-1", "삭제가능합니다");
     }
     @Transactional
-    public RsData<String> delete(LikeablePerson likeablePerson) {
+    public RsData<String> cancel(LikeablePerson likeablePerson) {
 
         // 당신이 생성한 좋아요가 사라졌습니다.
         likeablePerson.getFromInstaMember().removeFromLikeablePerson(likeablePerson);
