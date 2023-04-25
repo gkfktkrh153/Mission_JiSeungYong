@@ -29,9 +29,9 @@ public class NotProd {
             Member memberUser3 = memberService.join("user3", "1234").getData();
             Member memberUser4 = memberService.join("user4", "1234").getData();
 
-            Member memberUser5ByKakao = memberService.whenSocialLogin("KAKAO", "KAKAO__CLIENT_ID").getData();
-            Member memberUser6ByGoogle = memberService.whenSocialLogin("GOOGLE", "GOOGLE__CLIENT_ID").getData();
-            Member memberUser7ByNAVER = memberService.whenSocialLogin("GOOGLE", "NAVER__CLIENT_ID").getData();
+            Member memberUser5ByKakao = memberService.whenSocialLogin("KAKAO", environment.getProperty("KAKAO_CLIENT_ID")).getData();
+            Member memberUser6ByGoogle = memberService.whenSocialLogin("GOOGLE", environment.getProperty("GOOGLE_CLIENT_ID")).getData();
+            Member memberUser7ByNAVER = memberService.whenSocialLogin("GOOGLE", environment.getProperty("NAVER_CLIENT_ID")).getData();
 
             instaMemberService.connect(memberUser2, "insta_user2", "M");
             instaMemberService.connect(memberUser3, "insta_user3", "W");
