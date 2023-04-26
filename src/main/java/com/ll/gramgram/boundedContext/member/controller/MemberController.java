@@ -66,11 +66,6 @@ public class MemberController {
     @GetMapping("/me") // 로그인 한 나의 정보 보여주는 페이지
 
     public String showMe(Model model) {
-            if (!rq.getMember().hasConnectedInstaMember()) {
-                return rq.historyBack("먼저 본인의 인스타그램 아이디를 입력해주세요.");
-            }
-
-            InstaMember instaMember = rq.getMember().getInstaMember();
 
 
             return "usr/member/me";
