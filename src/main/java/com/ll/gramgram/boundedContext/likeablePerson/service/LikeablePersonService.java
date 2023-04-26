@@ -8,16 +8,12 @@ import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.thymeleaf.expression.Lists;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -118,5 +114,31 @@ public class LikeablePersonService {
 
 
         return RsData.of("S-1", "입력하신 인스타유저(%s)가 호감상대에서 삭제되었습니다".formatted(likeablePerson.getToInstaMemberUsername()));
+    }
+
+    public RsData<LikeablePerson> modifyLike(Member actor, Long id, int attractiveTypeCode) {
+        return null;
+    }
+
+    public RsData canModifyLike(Member actor, LikeablePerson likeablePerson) {
+        if (!actor.hasConnectedInstaMember()) {
+            return RsData.of("F-1", "먼저 본인의 인스타그램 아이디를 입력해주세요.");
+        }
+
+        InstaMember fromInstaMember = actor.getInstaMember();
+
+        if (!Objects.equals(likeablePerson.getFromInstaMember().getId(), fromInstaMember.getId())) {
+            return RsData.of("F-2", "해당 호감표시를 취소할 권한이 없습니다.");
+        }
+
+
+        return RsData.of("S-1", "호감표시취소가 가능합니다.");
+    }
+    public List<LikeablePerson> findByFromInstaMemberId(Long fromInstaMemberId) {
+        return likeablePersonRepository.findByFromInstaMemberId(fromInstaMemberId);
+    }
+
+    public Optional<LikeablePerson> findById(Long id) {
+        return likeablePersonRepository.findById(id);
     }
 }
