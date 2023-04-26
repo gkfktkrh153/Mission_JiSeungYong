@@ -1,78 +1,66 @@
 package com.ll.gramgram.boundedContext.instaMember.entity;
-
-import com.ll.gramgram.base.baseEntity.BaseEntity;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.LazyCollection;
 import org.hibernate.annotations.LazyCollectionOption;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-import static jakarta.persistence.GenerationType.IDENTITY;
-
-@SuperBuilder
-@NoArgsConstructor
-@AllArgsConstructor
-@ToString(callSuper = true)
 @Entity
 @Getter
-public class InstaMember extends BaseEntity {
-
+@NoArgsConstructor
+@SuperBuilder
+@ToString(callSuper = true)
+public class InstaMember extends InstaMemberBase {
     @Column(unique = true)
     private String username;
-    @Setter
-    private String gender;
 
     @OneToMany(mappedBy = "fromInstaMember", cascade = {CascadeType.ALL})
-    @OrderBy("id desc")
+    @OrderBy("id desc") // 정렬
     @LazyCollection(LazyCollectionOption.EXTRA)
-    @Builder.Default // @Builder가 있으면 new ArrayList(); rk 동작하지 않는데 이를 가능하게 해줌
-    private List<LikeablePerson> fromLikeablePerson = new ArrayList<>();
-
+    @Builder.Default // @Builder 가 있으면 ` = new ArrayList<>();` 가 작동하지 않는다. 그래서 이걸 붙여야 한다.
+    private List<LikeablePerson> fromLikeablePeople = new ArrayList<>();
 
     @OneToMany(mappedBy = "toInstaMember", cascade = {CascadeType.ALL})
-    @OrderBy("id desc")
+    @OrderBy("id desc") // 정렬
     @LazyCollection(LazyCollectionOption.EXTRA)
-    @Builder.Default // @Builder가 있으면 new ArrayList(); rk 동작하지 않는데 이를 가능하게 해줌
-    private List<LikeablePerson> toLikeablePerson = new ArrayList<>();
+    @Builder.Default // @Builder 가 있으면 ` = new ArrayList<>();` 가 작동하지 않는다. 그래서 이걸 붙여야 한다.
+    private List<LikeablePerson> toLikeablePeople = new ArrayList<>();
 
-    private long likesCountByGenderWomanAndAttractiveTypeCode1;
-    private long likesCountByGenderWomanAndAttractiveTypeCode2;
-    private long likesCountByGenderWomanAndAttractiveTypeCode3;
-    private long likesCountByGenderManAndAttractiveTypeCode1;
-    private long likesCountByGenderManAndAttractiveTypeCode2;
-    private long likesCountByGenderManAndAttractiveTypeCode3;
+    @OneToMany(mappedBy = "instaMember", cascade = {CascadeType.ALL})
+    @OrderBy("id desc") // 정렬
+    @Builder.Default
+    private List<InstaMemberSnapshot> instaMemberSnapshots = new ArrayList<>();
 
-    public Long getLikesCountByGenderWoman() {
-        return likesCountByGenderWomanAndAttractiveTypeCode1 + likesCountByGenderWomanAndAttractiveTypeCode2 + likesCountByGenderWomanAndAttractiveTypeCode3;
+    public void addFromLikeablePerson(LikeablePerson likeablePerson) {
+        fromLikeablePeople.add(0, likeablePerson);
     }
 
-    public Long getLikesCountByGenderMan() {
-        return likesCountByGenderManAndAttractiveTypeCode1 + likesCountByGenderManAndAttractiveTypeCode2 + likesCountByGenderManAndAttractiveTypeCode3;
+    public void addToLikeablePerson(LikeablePerson likeablePerson) {
+        toLikeablePeople.add(0, likeablePerson);
     }
 
-    public Long getLikesCountByAttractionTypeCode1() {
-        return likesCountByGenderWomanAndAttractiveTypeCode1 + likesCountByGenderManAndAttractiveTypeCode1;
+    public void removeFromLikeablePerson(LikeablePerson likeablePerson) {
+        fromLikeablePeople.removeIf(e -> e.equals(likeablePerson));
     }
 
-    public Long getLikesCountByAttractionTypeCode2() {
-        return likesCountByGenderWomanAndAttractiveTypeCode2 + likesCountByGenderManAndAttractiveTypeCode2;
+    public void removeToLikeablePerson(LikeablePerson likeablePerson) {
+        toLikeablePeople.removeIf(e -> e.equals(likeablePerson));
     }
 
-    public Long getLikesCountByAttractionTypeCode3() {
-        return likesCountByGenderWomanAndAttractiveTypeCode3 + likesCountByGenderManAndAttractiveTypeCode3;
+    public String getGenderDisplayName() {
+        return switch (gender) {
+            case "W" -> "여성";
+            default -> "남성";
+        };
     }
 
-    public Long getLikes() {
-        return getLikesCountByGenderWoman() + getLikesCountByGenderMan();
-    }
     public void increaseLikesCount(String gender, int attractiveTypeCode) {
         if (gender.equals("W") && attractiveTypeCode == 1) likesCountByGenderWomanAndAttractiveTypeCode1++;
         if (gender.equals("W") && attractiveTypeCode == 2) likesCountByGenderWomanAndAttractiveTypeCode2++;
@@ -80,6 +68,8 @@ public class InstaMember extends BaseEntity {
         if (gender.equals("M") && attractiveTypeCode == 1) likesCountByGenderManAndAttractiveTypeCode1++;
         if (gender.equals("M") && attractiveTypeCode == 2) likesCountByGenderManAndAttractiveTypeCode2++;
         if (gender.equals("M") && attractiveTypeCode == 3) likesCountByGenderManAndAttractiveTypeCode3++;
+
+        saveSnapshot();
     }
 
     public void decreaseLikesCount(String gender, int attractiveTypeCode) {
@@ -89,27 +79,44 @@ public class InstaMember extends BaseEntity {
         if (gender.equals("M") && attractiveTypeCode == 1) likesCountByGenderManAndAttractiveTypeCode1--;
         if (gender.equals("M") && attractiveTypeCode == 2) likesCountByGenderManAndAttractiveTypeCode2--;
         if (gender.equals("M") && attractiveTypeCode == 3) likesCountByGenderManAndAttractiveTypeCode3--;
-    }
-    public String getGenderDisplayName() {
-        return switch (gender) {
-            case "W" -> "여성";
-            default -> "남성";
-        };
-    }
-    public void addFromLikeablePerson(LikeablePerson likeablePerson)
-    {
-        fromLikeablePerson.add(0, likeablePerson);
-    }
-    public void addToLikeablePerson(LikeablePerson likeablePerson)
-    {
-        toLikeablePerson.add(0, likeablePerson);
+
+        saveSnapshot();
     }
 
-    public void removeFromLikeablePerson(LikeablePerson likeablePerson) {
-        fromLikeablePerson.removeIf(e -> e.equals(likeablePerson));
+    public boolean updateGender(String gender) {
+        if (gender.equals(this.gender)) return false;
+
+        boolean oldIsNull = this.gender == null;
+
+        String oldGender = this.gender;
+
+        getFromLikeablePeople()
+                .forEach(likeablePerson -> {
+                    // 내가 좋아하는 사람 불러오기
+                    InstaMember toInstaMember = likeablePerson.getToInstaMember();
+                    toInstaMember.decreaseLikesCount(oldGender, likeablePerson.getAttractiveTypeCode());
+                    toInstaMember.increaseLikesCount(gender, likeablePerson.getAttractiveTypeCode());
+                });
+
+        this.gender = gender;
+
+        if (!oldIsNull) saveSnapshot();
+
+        return true;
     }
 
-    public void removeToLikeablePerson(LikeablePerson likeablePerson) {
-        toLikeablePerson.removeIf(e -> e.equals(likeablePerson));
+    public void saveSnapshot() {
+        InstaMemberSnapshot instaMemberSnapshot = InstaMemberSnapshot.builder()
+                .instaMember(this)
+                .username(username)
+                .likesCountByGenderWomanAndAttractiveTypeCode1(likesCountByGenderWomanAndAttractiveTypeCode1)
+                .likesCountByGenderWomanAndAttractiveTypeCode2(likesCountByGenderWomanAndAttractiveTypeCode2)
+                .likesCountByGenderWomanAndAttractiveTypeCode3(likesCountByGenderWomanAndAttractiveTypeCode3)
+                .likesCountByGenderManAndAttractiveTypeCode1(likesCountByGenderManAndAttractiveTypeCode1)
+                .likesCountByGenderManAndAttractiveTypeCode2(likesCountByGenderManAndAttractiveTypeCode2)
+                .likesCountByGenderManAndAttractiveTypeCode3(likesCountByGenderManAndAttractiveTypeCode3)
+                .build();
+
+        instaMemberSnapshots.add(instaMemberSnapshot);
     }
 }
