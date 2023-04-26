@@ -115,9 +115,18 @@ public class LikeablePersonService {
 
         return RsData.of("S-1", "입력하신 인스타유저(%s)가 호감상대에서 삭제되었습니다".formatted(likeablePerson.getToInstaMemberUsername()));
     }
-
+    @Transactional
     public RsData<LikeablePerson> modifyLike(Member actor, Long id, int attractiveTypeCode) {
-        return null;
+        LikeablePerson likeablePerson = findById(id).orElseThrow();
+        RsData canModifyRsData = canModifyLike(actor, likeablePerson);
+
+        if (canModifyRsData.isFail()) {
+            return canModifyRsData;
+        }
+
+        likeablePerson.setAttractiveTypeCode(attractiveTypeCode);
+
+        return RsData.of("S-1", "호감사유를 수정하였습니다.");
     }
 
     public RsData canModifyLike(Member actor, LikeablePerson likeablePerson) {

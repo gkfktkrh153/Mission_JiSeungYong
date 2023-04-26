@@ -271,4 +271,23 @@ public class LikeablePersonControllerTests {
 
         Assertions.assertThat(likeablePerson.getId()).isEqualTo(2L);
     }
+    @Test
+    @DisplayName("수정 폼 처리")
+    @WithUserDetails("user3")
+    void t013() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/likeablePerson/modify/3")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().is3xxRedirection());
+        ;
+    }
 }
