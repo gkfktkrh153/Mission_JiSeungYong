@@ -16,12 +16,16 @@ public class HomeController {
     private final Rq rq;
     @GetMapping("/")
     public String showMain() {
+        if (rq.isLogout()) return "redirect:/usr/member/login";
+
         return "usr/home/main";
     }
-
+    @GetMapping("/usr/home/about")
+    public String showAbout() {
+        return "usr/home/about";
+    }
     @GetMapping("/usr/debugSession")
     @ResponseBody
-    @PreAuthorize("hasAuthority('admin')")
     public String showDebugSession(HttpSession session) {
         StringBuilder sb = new StringBuilder("Session content:\n");
 

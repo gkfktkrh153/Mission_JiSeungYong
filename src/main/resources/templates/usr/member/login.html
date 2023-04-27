@@ -48,11 +48,11 @@
     <div class="max-w-2xl w-full px-4">
         <h1 class="mb-4">
             <i class="fa-solid fa-arrow-right-to-bracket"></i>
-            로그인
+            시작하기
         </h1>
 
         <form th:action method="POST" class="flex flex-col gap-6" onsubmit="LoginForm__submit(this); return false;">
-            <th:block th:if="${param.admin}">
+            <th:block th:if="${@rq.refererAdminPage}">
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">아이디</span>
@@ -87,6 +87,9 @@
                 <i class="fa-brands fa-google text-[color:#ff4000]"></i>
                 <span>구글 로그인</span>
             </a>
+            <div class="flex flex-wrap justify-center">
+                <a href="/usr/home/about" class="btn btn-link">그램그램이란?</a>
+            </div>
         </form>
     </div>
 </main>
