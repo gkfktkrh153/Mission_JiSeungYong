@@ -73,4 +73,5 @@ public class LikeablePerson extends BaseEntity {
     public String getJdenticon() {
         return Ut.hash.sha256(fromInstaMember.getId() + "_likes_" + toInstaMember.getId());
     }
+
 }
