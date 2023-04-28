@@ -17,12 +17,12 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .formLogin(
-                        formLogin -> formLogin
-                                .loginPage("/usr/member/login")
-                )
                 .oauth2Login(
                         oauth2Login -> oauth2Login
+                                .loginPage("/usr/member/login")
+                )
+                .formLogin(
+                        formLogin -> formLogin
                                 .loginPage("/usr/member/login")
                 )
                 .logout(

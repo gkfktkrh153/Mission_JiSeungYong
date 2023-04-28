@@ -10,10 +10,4 @@ import org.springframework.web.servlet.NoHandlerFoundException;
 @ControllerAdvice // 모든 컨트롤러를 대상으로
 public class GlobalExceptionHandler {
 
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    @ExceptionHandler(NoHandlerFoundException.class) //
-    public String handleNotFoundError(Model model, NoHandlerFoundException ex) {
-        model.addAttribute("exception", ex);
-        return "/usr/home/main";
-    }
 }
