@@ -2,6 +2,7 @@ package com.ll.gramgram.boundedContext.likeablePerson.controller;
 
 
 import com.ll.gramgram.base.appConfig.AppConfig;
+import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
@@ -294,19 +295,131 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("호감표시를 변경하면 쿨타임이 저장된다.")
     void t014() throws Exception{
-        // 현재시점 기준에서 쿨타임이 다 차는 시간을 구한다.(미래)
+        // 현재 시점에서 쿨타임이 다 차는 시간을 구한다.(미래)
         LocalDateTime coolTime = AppConfig.getLikeablePersonModifyUnlockDate();
 
         Member memberUser2 = memberService.findByUsername("user2").orElseThrow();
 
-        // 호감표시를 생성하면 쿨타임이 지정되기 때문에, 그래서 바로 수정이 안된다.
+        // 호감표시를 생성하면 쿨타임이 지정되기 때문에, 바로 수정이 안된다.
         // 그래서 강제로 쿨타임이 지난것으로 만든다.
         // 테스트를 위해서 억지로 값을 넣는다.
         LikeablePerson likeablePersonToBts = likeablePersonService.like(memberUser2, "bts", 2).getData();
-        Ut.reflection.setFieldValue(likeablePersonToBts, "modifyUnlockDate", LocalDateTime.now().minusSeconds(-1));
-
-        likeablePersonService.modifyAttractive(memberUser2, likeablePersonToBts, 1);
+        Ut.reflection.setFieldValue(likeablePersonToBts, "modifyUnlockDate", LocalDateTime.now());
+        RsData<LikeablePerson> likeablePersonRsData = likeablePersonService.modifyAttractive(memberUser2, likeablePersonToBts, 1);
 
         Assertions.assertThat(likeablePersonToBts.getModifyUnlockDate().isAfter(coolTime));
+    }
+    @Test
+    @DisplayName("호감을 표현하거나 변경한 뒤 쿨타임이 지나면 다시 호감 변경이 가능합니다.")
+    @WithUserDetails("user3")
+    void t015() throws Exception{
+
+        Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
+
+        // 현재 호감을 표현한 상태이기 때문에 바로 수정이 안된다.
+        // 그래서 강제로 쿨타임이 지난것으로 만들어 테스트
+        LikeablePerson likeablePersonToInstaUser109 = likeablePersonService.findById(12L).orElse(null);
+        Ut.reflection.setFieldValue(likeablePersonToInstaUser109, "modifyUnlockDate", LocalDateTime.now());
+
+        ResultActions resultActions = mvc
+                .perform(post("/usr/likeablePerson/modify/12")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().is3xxRedirection());
+
+
+    }
+    @Test
+    @DisplayName("호감표시를 변경하면 3시간 동안 호감표시가 불가능합니다.")
+    @WithUserDetails("user3")
+    void t016() throws Exception{
+
+        Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
+        LikeablePerson likeablePersonToInstaUser109 = likeablePersonService.findById(12L).orElse(null);
+
+        Ut.reflection.setFieldValue(likeablePersonToInstaUser109, "modifyUnlockDate", LocalDateTime.now().plusSeconds(-1));
+        
+        RsData<LikeablePerson> likeablePersonRsData1 = likeablePersonService.modifyAttractive(memberUser3, likeablePersonToInstaUser109, 3);
+        // 쿨타임을 강제로 초기화 시킨 뒤 호감을 변경합니다.
+
+
+        ResultActions resultActions = mvc
+                .perform(post("/usr/likeablePerson/modify/12")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("modify"))
+                .andExpect(status().is4xxClientError());
+
+
+    }
+    @Test
+    @DisplayName("호감을 표현하거나 변경한 뒤 쿨타임이 지나면 다시 호감 삭제가 가능합니다.")
+    @WithUserDetails("user3")
+    void t017() throws Exception{
+
+        Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
+
+        // 현재 호감을 표현한 상태이기 때문에 바로 수정이 안된다.
+        // 그래서 강제로 쿨타임이 지난것으로 만들어 테스트
+        LikeablePerson likeablePersonToInstaUser109 = likeablePersonService.findById(12L).orElse(null);
+        Ut.reflection.setFieldValue(likeablePersonToInstaUser109, "modifyUnlockDate", LocalDateTime.now().plusSeconds(-1));
+
+        ResultActions resultActions = mvc
+                .perform(delete("/usr/likeablePerson/12")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("cancel"))
+                .andExpect(status().is3xxRedirection());
+
+
+    }
+    @Test
+    @DisplayName("호감표시를 변경하면 3시간 동안 호감표시가 불가능합니다.")
+    @WithUserDetails("user3")
+    void t018() throws Exception{
+
+        Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
+        LikeablePerson likeablePersonToInstaUser109 = likeablePersonService.findById(12L).orElse(null);
+
+        Ut.reflection.setFieldValue(likeablePersonToInstaUser109, "modifyUnlockDate", LocalDateTime.now().plusSeconds(-1));
+
+        RsData<LikeablePerson> likeablePersonRsData1 = likeablePersonService.modifyAttractive(memberUser3, likeablePersonToInstaUser109, 3);
+        // 쿨타임을 강제로 초기화 시킨 뒤 호감을 변경합니다.
+        Thread.sleep(1000); // 변경처리가 끝난 뒤 요청보내기 위함
+
+
+        ResultActions resultActions = mvc
+                .perform(delete("/usr/likeablePerson/12")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("attractiveTypeCode", "3")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("cancel"))
+                .andExpect(status().is4xxClientError());
+
+
     }
 }
