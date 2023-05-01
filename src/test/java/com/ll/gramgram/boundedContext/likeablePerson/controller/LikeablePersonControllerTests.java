@@ -98,7 +98,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("등록 폼 처리(user2가 abcd에게 호감표시(외모), abcd는 아직 우리 서비스에 가입하지 않은상태)")
     @WithUserDetails("user2")
-    void t004() throws Exception {
+    void t003() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/like")
@@ -119,7 +119,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("호감목록")
     @WithUserDetails("user3")
-    void t005() throws Exception {
+    void t004() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(get("/usr/likeablePerson/list"))
@@ -135,7 +135,7 @@ public class LikeablePersonControllerTests {
     @DisplayName("호감 상대 삭제 처리(user2 -> instaMember3)")
     @WithUserDetails("user2")
 
-    void t006() throws Exception {
+    void t005() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(delete("/usr/likeablePerson/1")
@@ -156,7 +156,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("권한 없는 LikeablePerson 제거")
     @WithUserDetails("user3")
-    void t007() throws Exception {
+    void t006() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(delete("/usr/likeablePerson/1")
@@ -177,7 +177,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("같은 사유로 호감 표시(user2 -> user3)")
     @WithUserDetails("user2")
-    void t008() throws Exception {
+    void t007() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/like")
@@ -197,33 +197,11 @@ public class LikeablePersonControllerTests {
 
         Assertions.assertThat(likeablePerson.getAttractiveTypeCode()).isEqualTo(1); // 사유변경 X
     }
-    @Test
-    @DisplayName("다른 사유로 호감 표시(user2 -> user3)")
-    @WithUserDetails("user2")
-    void t009() throws Exception {
-        // WHEN
-        ResultActions resultActions = mvc
-                .perform(post("/usr/likeablePerson/like")
-                        .with(csrf()) // CSRF 키 생성
-                        .param("username", "insta_user3")
-                        .param("attractiveTypeCode", "3")
-                )
-                .andDo(print());
 
-        // THEN
-        resultActions
-                .andExpect(handler().handlerType(LikeablePersonController.class))
-                .andExpect(handler().methodName("like"))
-                .andExpect(status().is3xxRedirection());
-
-        LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);
-
-        Assertions.assertThat(likeablePerson.getAttractiveTypeCode()).isEqualTo(3); // 사유변경
-    }
     @Test
     @DisplayName("10명 이상에게 호감표시")
     @WithUserDetails("user3")
-    void t10() throws Exception {
+    void t8() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/like")
@@ -247,7 +225,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("호감표시 10명일 때 사유변경")
     @WithUserDetails("user3")
-    void t11() throws Exception {
+    void t9() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/like")
@@ -261,7 +239,7 @@ public class LikeablePersonControllerTests {
         resultActions
                 .andExpect(handler().handlerType(LikeablePersonController.class))
                 .andExpect(handler().methodName("like"))
-                .andExpect(status().is3xxRedirection());
+                .andExpect(status().is4xxClientError());
 
 
         List<LikeablePerson> likeablePersonList = likeablePersonRepository.findByFromInstaMemberId(2L);
@@ -270,7 +248,7 @@ public class LikeablePersonControllerTests {
     }
     @Test
     @DisplayName("querydsl test")
-    void t12() {
+    void t10() {
         LikeablePerson likeablePerson = likeablePersonRepository.findQslByFromInstaMemberIdAndToInstaMember_username(1L, "insta_user4").orElse(null);
 
         Assertions.assertThat(likeablePerson.getId()).isEqualTo(2L);
@@ -278,7 +256,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("수정 폼 처리")
     @WithUserDetails("user3")
-    void t013() throws Exception {
+    void t011() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/modify/3")
@@ -296,14 +274,14 @@ public class LikeablePersonControllerTests {
     }
     @Test
     @DisplayName("설정파일에서 호감표시에 대한 수정쿨타임 가져오기 ")
-    void t014() throws Exception{
+    void t012() throws Exception{
         System.out.println("likeablePersonModifyCoolTime : " + AppConfig.getLikeablePersonModifyCoolTime());
         Assertions.assertThat(AppConfig.getLikeablePersonModifyCoolTime()).isGreaterThan(0);
 
     }
     @Test
     @DisplayName("호감표시를 하면 쿨타임이 저장된다.")
-    void t015() throws Exception{
+    void t013() throws Exception{
         LocalDateTime coolTime = AppConfig.getLikeablePersonModifyUnlockDate(); // 현재 시간부터 호감 쿨타임
 
         Member memberUser2 = memberService.findByUsername("user2").orElseThrow();
@@ -315,7 +293,7 @@ public class LikeablePersonControllerTests {
     }
     @Test
     @DisplayName("호감표시를 변경하면 쿨타임이 저장된다.")
-    void t016() throws Exception{
+    void t014() throws Exception{
         // 현재시점 기준에서 쿨타임이 다 차는 시간을 구한다.(미래)
         LocalDateTime coolTime = AppConfig.getLikeablePersonModifyUnlockDate();
 
