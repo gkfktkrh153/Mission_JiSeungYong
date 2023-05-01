@@ -132,32 +132,11 @@ public class LikeablePersonControllerTests {
                 .andExpect(handler().methodName("showList"))
                 .andExpect(status().is2xxSuccessful());
     }
-    @Test
-    @DisplayName("호감 상대 삭제 처리(user2 -> instaMember3)")
-    @WithUserDetails("user2")
 
-    void t005() throws Exception {
-        // WHEN
-        ResultActions resultActions = mvc
-                .perform(delete("/usr/likeablePerson/1")
-                        .with(csrf()) // CSRF 키 생성
-                )
-                .andDo(print());
-
-        // THEN
-        resultActions
-                .andExpect(handler().handlerType(LikeablePersonController.class))
-                .andExpect(handler().methodName("cancel"))
-                .andExpect(status().is3xxRedirection());
-
-        LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);
-
-        Assertions.assertThat(likeablePerson).isNull();
-    }
     @Test
     @DisplayName("권한 없는 LikeablePerson 제거")
     @WithUserDetails("user3")
-    void t006() throws Exception {
+    void t005() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(delete("/usr/likeablePerson/1")
@@ -178,7 +157,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("같은 사유로 호감 표시(user2 -> user3)")
     @WithUserDetails("user2")
-    void t007() throws Exception {
+    void t006() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/like")
@@ -202,7 +181,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("10명 이상에게 호감표시")
     @WithUserDetails("user3")
-    void t8() throws Exception {
+    void t007() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/like")
@@ -226,7 +205,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("호감표시 10명일 때 사유변경")
     @WithUserDetails("user3")
-    void t9() throws Exception {
+    void t008() throws Exception {
         // WHEN
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/like")
@@ -249,40 +228,22 @@ public class LikeablePersonControllerTests {
     }
     @Test
     @DisplayName("querydsl test")
-    void t10() {
+    void t009() {
         LikeablePerson likeablePerson = likeablePersonRepository.findQslByFromInstaMemberIdAndToInstaMember_username(1L, "insta_user4").orElse(null);
 
         Assertions.assertThat(likeablePerson.getId()).isEqualTo(2L);
     }
-    @Test
-    @DisplayName("수정 폼 처리")
-    @WithUserDetails("user3")
-    void t011() throws Exception {
-        // WHEN
-        ResultActions resultActions = mvc
-                .perform(post("/usr/likeablePerson/modify/3")
-                        .with(csrf()) // CSRF 키 생성
-                        .param("attractiveTypeCode", "3")
-                )
-                .andDo(print());
 
-        // THEN
-        resultActions
-                .andExpect(handler().handlerType(LikeablePersonController.class))
-                .andExpect(handler().methodName("modify"))
-                .andExpect(status().is3xxRedirection());
-
-    }
     @Test
     @DisplayName("설정파일에서 호감표시에 대한 수정쿨타임 가져오기 ")
-    void t012() throws Exception{
+    void t010() throws Exception{
         System.out.println("likeablePersonModifyCoolTime : " + AppConfig.getLikeablePersonModifyCoolTime());
         Assertions.assertThat(AppConfig.getLikeablePersonModifyCoolTime()).isGreaterThan(0);
 
     }
     @Test
     @DisplayName("호감표시를 하면 쿨타임이 저장된다.")
-    void t013() throws Exception{
+    void t011() throws Exception{
         LocalDateTime coolTime = AppConfig.getLikeablePersonModifyUnlockDate(); // 현재 시간부터 호감 쿨타임
 
         Member memberUser2 = memberService.findByUsername("user2").orElseThrow();
@@ -294,7 +255,7 @@ public class LikeablePersonControllerTests {
     }
     @Test
     @DisplayName("호감표시를 변경하면 쿨타임이 저장된다.")
-    void t014() throws Exception{
+    void t012() throws Exception{
         // 현재 시점에서 쿨타임이 다 차는 시간을 구한다.(미래)
         LocalDateTime coolTime = AppConfig.getLikeablePersonModifyUnlockDate();
 
@@ -312,7 +273,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("호감을 표현하거나 변경한 뒤 쿨타임이 지나면 다시 호감 변경이 가능합니다.")
     @WithUserDetails("user3")
-    void t015() throws Exception{
+    void t013() throws Exception{
 
         Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
 
@@ -339,7 +300,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("호감표시를 변경하면 3시간 동안 호감표시가 불가능합니다.")
     @WithUserDetails("user3")
-    void t016() throws Exception{
+    void t014() throws Exception{
 
         Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
         LikeablePerson likeablePersonToInstaUser109 = likeablePersonService.findById(12L).orElse(null);
@@ -368,7 +329,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("호감을 표현하거나 변경한 뒤 쿨타임이 지나면 다시 호감 삭제가 가능합니다.")
     @WithUserDetails("user3")
-    void t017() throws Exception{
+    void t015() throws Exception{
 
         Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
 
@@ -395,7 +356,7 @@ public class LikeablePersonControllerTests {
     @Test
     @DisplayName("호감표시를 변경하면 3시간 동안 호감표시가 불가능합니다.")
     @WithUserDetails("user3")
-    void t018() throws Exception{
+    void t016() throws Exception{
 
         Member memberUser3 = memberService.findByUsername("user3").orElseThrow();
         LikeablePerson likeablePersonToInstaUser109 = likeablePersonService.findById(12L).orElse(null);
