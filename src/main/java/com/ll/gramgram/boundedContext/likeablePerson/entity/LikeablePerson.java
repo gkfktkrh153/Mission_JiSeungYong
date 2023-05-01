@@ -11,8 +11,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import lombok.experimental.SuperBuilder;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 @Entity
 @Getter
@@ -40,7 +42,11 @@ public class LikeablePerson extends BaseEntity {
 
     // 초 단위에서 올림 해주세요.
     public String getModifyUnlockDateRemainStrHuman() {
-        return "2시간 16분";
+        return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(modifyUnlockDate);
+    }
+
+    public void updateModifyUnlockDate(){
+        this.modifyUnlockDate = AppConfig.getLikeablePersonModifyUnlockDate();
     }
 
     public RsData updateAttractionTypeCode(int attractiveTypeCode) {
