@@ -97,6 +97,9 @@ public class LikeablePersonService {
 
         if (actorInstaMemberId != fromInstaMemberId)
             return RsData.of("F-2", "권한이 없습니다.");
+        if(!likeablePerson.isModifyUnlocked())
+            return RsData.of("F-3", likeablePerson.getModifyUnlockDateRemainStrHuman() + "부터 호감 삭제가 가능합니다.");
+
 
         return RsData.of("S-1", "삭제가능합니다.");
     }
@@ -174,6 +177,7 @@ public class LikeablePersonService {
         return RsData.of("S-3", "%s님에 대한 호감사유를 %s에서 %s(으)로 변경합니다.".formatted(username, oldAttractiveTypeDisplayName, newAttractiveTypeDisplayName), likeablePerson);
     }
 
+
     // 처음으로 호감 표시할 때 사용
     private RsData<LikeablePerson> modifyAttractive(Member actor, String username, int attractiveTypeCode) {
         // 액터가 생성한 `좋아요` 들 가져오기
@@ -209,10 +213,12 @@ public class LikeablePersonService {
         InstaMember fromInstaMember = actor.getInstaMember();
 
         if (!Objects.equals(likeablePerson.getFromInstaMember().getId(), fromInstaMember.getId())) {
-            return RsData.of("F-2", "해당 호감표시를 취소할 권한이 없습니다.");
+            return RsData.of("F-2", "해당 호감표시를 변경할 권한이 없습니다.");
         }
+        if(!likeablePerson.isModifyUnlocked())
+            return RsData.of("F-3", likeablePerson.getModifyUnlockDateRemainStrHuman() + "부터 호감 변경이 가능합니다.");
 
 
-        return RsData.of("S-1", "호감표시취소가 가능합니다.");
+        return RsData.of("S-1", "호감표시변경이 가능합니다.");
     }
 }
