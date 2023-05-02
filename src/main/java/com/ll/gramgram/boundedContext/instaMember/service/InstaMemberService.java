@@ -8,6 +8,8 @@ import com.ll.gramgram.boundedContext.instaMember.repository.InstaMemberSnapshot
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
+import com.ll.gramgram.boundedContext.notification.entity.Notification;
+import com.ll.gramgram.boundedContext.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +23,7 @@ public class InstaMemberService {
     private final InstaMemberRepository instaMemberRepository;
     private final MemberService memberService;
     private final InstaMemberSnapshotRepository instaMemberSnapshotRepository;
-
+    private final NotificationRepository notificationRepository;
     public Optional<InstaMember> findByUsername(String username) {
         return instaMemberRepository.findByUsername(username);
     }
@@ -98,6 +100,16 @@ public class InstaMemberService {
         toInstaMember.decreaseLikesCount(fromInstaMember.getGender(), oldAttractiveTypeCode);
         toInstaMember.increaseLikesCount(fromInstaMember.getGender(), likeablePerson.getAttractiveTypeCode());
 
+        Notification notification = Notification.builder()
+                .fromInstaMember(likeablePerson.getFromInstaMember())
+                .toInstaMember(likeablePerson.getToInstaMember())
+                .oldAttractiveTypeCode(oldAttractiveTypeCode)
+                .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
+                .typeCode("ModifyLike")
+                .build();
+
+        notificationRepository.save(notification);
+
         InstaMemberSnapshot snapshot = toInstaMember.snapshot("ModifyAttractiveType");
 
         saveSnapshot(snapshot);
@@ -108,6 +120,14 @@ public class InstaMemberService {
         InstaMember toInstaMember = likeablePerson.getToInstaMember();
 
         toInstaMember.increaseLikesCount(fromInstaMember.getGender(), likeablePerson.getAttractiveTypeCode());
+        Notification notification = Notification.builder()
+                .fromInstaMember(likeablePerson.getFromInstaMember())
+                .toInstaMember(likeablePerson.getToInstaMember())
+                .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
+                .typeCode("Like")
+                .build();
+
+        notificationRepository.save(notification);
 
         InstaMemberSnapshot snapshot = toInstaMember.snapshot("Like");
 

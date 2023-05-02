@@ -125,7 +125,7 @@ public class LikeablePersonService {
                 .findFirst()
                 .orElse(null);
 
-        if (fromLikeablePerson != null && fromLikeablePerson.getAttractiveTypeCode() == attractiveTypeCode) {
+        if (fromLikeablePerson != null) {
             return RsData.of("F-3", "이미 %s님에 대해서 호감표시를 했습니다.".formatted(username));
         }
 

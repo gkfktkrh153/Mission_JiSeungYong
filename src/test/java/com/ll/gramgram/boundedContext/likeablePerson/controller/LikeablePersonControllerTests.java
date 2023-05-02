@@ -383,4 +383,27 @@ public class LikeablePersonControllerTests {
 
 
     }
+    @Test
+    @DisplayName("같은 대상에게 여러번 호감 표시(user2 -> user3)")
+    @WithUserDetails("user2")
+    void t017() throws Exception {
+        // WHEN
+        ResultActions resultActions = mvc
+                .perform(post("/usr/likeablePerson/like")
+                        .with(csrf()) // CSRF 키 생성
+                        .param("username", "insta_user3")
+                        .param("attractiveTypeCode", "1")
+                )
+                .andDo(print());
+
+        // THEN
+        resultActions
+                .andExpect(handler().handlerType(LikeablePersonController.class))
+                .andExpect(handler().methodName("like"))
+                .andExpect(status().is4xxClientError());
+
+        LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);
+
+        Assertions.assertThat(likeablePerson.getAttractiveTypeCode()).isEqualTo(1); // 사유변경 X
+    }
 }

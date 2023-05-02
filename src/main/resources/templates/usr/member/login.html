@@ -52,7 +52,7 @@
         </h1>
 
         <form th:action method="POST" class="flex flex-col gap-6" onsubmit="LoginForm__submit(this); return false;">
-            <th:block th:if="${@rq.refererAdminPage or param.admin != null}">
+            <!--<th:block th:if="${@rq.refererAdminPage or param.admin != null}">-->
                 <div class="form-control">
                     <label class="label">
                         <span class="label-text">
@@ -77,7 +77,7 @@
                     <i class="fa-solid fa-arrow-right-to-bracket"></i>
                     <span>로그인</span>
                 </button>
-            </th:block>
+            <!--</th:block>-->
 
             <a href="/oauth2/authorization/kakao" class="btn btn-block btn-outline gap-1">
                 <i class="fa-solid fa-comment text-[color:#ffe812]"></i>
