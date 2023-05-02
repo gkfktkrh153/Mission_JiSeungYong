@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @ToString(callSuper = true)
 public class Notification extends BaseEntity {
+
     private LocalDateTime readDate;
     @ManyToOne
     @ToString.Exclude
@@ -45,5 +46,8 @@ public class Notification extends BaseEntity {
             return "성격";
         else
             return "능력";
+    }
+    public void check(){
+        this.readDate = LocalDateTime.now();
     }
 }

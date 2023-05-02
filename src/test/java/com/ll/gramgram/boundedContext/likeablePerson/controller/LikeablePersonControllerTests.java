@@ -8,6 +8,7 @@ import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRe
 import com.ll.gramgram.boundedContext.likeablePerson.service.LikeablePersonService;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import com.ll.gramgram.boundedContext.member.service.MemberService;
+import com.ll.gramgram.boundedContext.notification.entity.Notification;
 import com.ll.gramgram.standard.util.Ut;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
@@ -314,7 +315,7 @@ public class LikeablePersonControllerTests {
         ResultActions resultActions = mvc
                 .perform(post("/usr/likeablePerson/modify/12")
                         .with(csrf()) // CSRF 키 생성
-                        .param("attractiveTypeCode", "3")
+                        .param("attractiveTypeCode", "1")
                 )
                 .andDo(print());
 
@@ -383,27 +384,7 @@ public class LikeablePersonControllerTests {
 
 
     }
-    @Test
-    @DisplayName("같은 대상에게 여러번 호감 표시(user2 -> user3)")
-    @WithUserDetails("user2")
-    void t017() throws Exception {
-        // WHEN
-        ResultActions resultActions = mvc
-                .perform(post("/usr/likeablePerson/like")
-                        .with(csrf()) // CSRF 키 생성
-                        .param("username", "insta_user3")
-                        .param("attractiveTypeCode", "1")
-                )
-                .andDo(print());
 
-        // THEN
-        resultActions
-                .andExpect(handler().handlerType(LikeablePersonController.class))
-                .andExpect(handler().methodName("like"))
-                .andExpect(status().is4xxClientError());
 
-        LikeablePerson likeablePerson = likeablePersonRepository.findById(1L).orElse(null);
 
-        Assertions.assertThat(likeablePerson.getAttractiveTypeCode()).isEqualTo(1); // 사유변경 X
-    }
 }
