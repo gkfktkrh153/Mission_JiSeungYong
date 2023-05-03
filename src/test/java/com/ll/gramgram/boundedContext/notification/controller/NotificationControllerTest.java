@@ -62,7 +62,7 @@ class NotificationControllerTest {
     @Autowired
     private LikeablePersonService likeablePersonService;
     @Test
-    @DisplayName("공지사항을 확인했을 때 readDate갱신")
+    @DisplayName("안내사항을 확인했을 때 readDate갱신")
     @WithUserDetails("user4")
     void t001() throws Exception {
 
@@ -86,7 +86,7 @@ class NotificationControllerTest {
         List<Notification> notifications = notificationService.findByToInstaMember(instaMember);
 
         /*
-         공지사항 리스트를 확인하는 순간 나에 대한 공지사항들은 전부 readDate가 갱신됨
+         안내사항 리스트를 확인하는 순간 나에 대한 안내사항들은 전부 readDate가 갱신됨
          */
         notifications.stream()
                 .forEach(notification -> Assertions.assertThat(notification.getReadDate()).isNotNull());
