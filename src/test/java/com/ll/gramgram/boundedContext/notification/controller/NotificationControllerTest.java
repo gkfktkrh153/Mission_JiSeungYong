@@ -83,7 +83,7 @@ class NotificationControllerTest {
         Member user = memberService.findByUsername("user4").orElse(null);
         InstaMember instaMember = user.getInstaMember();
 
-        List<Notification> notifications = notificationService.findByToInstaMember(instaMember);
+        List<Notification> notifications = notificationService.findByToInstaMemberAndReadDateIsNull(instaMember);
 
         /*
          안내사항 리스트를 확인하는 순간 나에 대한 안내사항들은 전부 readDate가 갱신됨
@@ -116,7 +116,7 @@ class NotificationControllerTest {
         Member user = memberService.findByUsername("user2").orElse(null);
         InstaMember instaMember = user.getInstaMember();
 
-        List<Notification> notifications = notificationService.findByToInstaMember(instaMember);
+        List<Notification> notifications = notificationService.findByToInstaMemberAndReadDateIsNull(instaMember);
 
         Assertions.assertThat(notifications.size()).isEqualTo(1);
 
@@ -148,7 +148,7 @@ class NotificationControllerTest {
         Member user = memberService.findByUsername("user3").orElse(null);
         InstaMember instaMember = user.getInstaMember();
 
-        List<Notification> notifications = notificationService.findByToInstaMember(instaMember);
+        List<Notification> notifications = notificationService.findByToInstaMemberAndReadDateIsNull(instaMember);
         Assertions.assertThat(notifications.size()).isEqualTo(2);
         // notPr
 

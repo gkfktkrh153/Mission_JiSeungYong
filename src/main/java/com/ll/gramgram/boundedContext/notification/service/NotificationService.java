@@ -15,12 +15,12 @@ import java.util.List;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
 
-    public List<Notification> findByToInstaMember(InstaMember toInstaMember) {
-        return notificationRepository.findByToInstaMember(toInstaMember);
+    public List<Notification> findByToInstaMemberAndReadDateIsNull(InstaMember toInstaMember) {
+        return notificationRepository.findByToInstaMemberAndReadDateIsNull(toInstaMember);
     }
     @Transactional
     public void checkNotification(List<Notification> notifications){
-        notifications.stream().filter(notification -> notification.getReadDate() == null)
+        notifications.stream()
                 .forEach(notification -> notification.check());
 
 
