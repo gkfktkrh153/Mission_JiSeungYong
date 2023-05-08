@@ -53,9 +53,9 @@ public class NotProd {
                 likeablePersonService.like(memberUser1, "insta_user7", 1);
                 likeablePersonService.like(memberUser2, "insta_user7", 2);
                 likeablePersonService.like(memberUser3, "insta_user7", 3);
-                likeablePersonService.like(memberUser4, "insta_user7", 4);
-                likeablePersonService.like(memberUser5, "insta_user7", 5);
-                likeablePersonService.like(memberUser6, "insta_user7", 6);
+                likeablePersonService.like(memberUser4, "insta_user7", 1);
+                likeablePersonService.like(memberUser5, "insta_user7", 2);
+                likeablePersonService.like(memberUser6, "insta_user7", 3);
 
                 for (int i = 100; i < 110; i++){
                     likeablePersonService.like(memberUser3, String.format("insta_user%d",i), 2);
