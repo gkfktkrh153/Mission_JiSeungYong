@@ -20,12 +20,16 @@ public class NotificationService {
     public List<Notification> findByToInstaMemberAndReadDateIsNull(InstaMember toInstaMember) {
         return notificationRepository.findByToInstaMemberAndReadDateIsNull(toInstaMember);
     }
+    public List<Notification> findByToInstaMember_username(String username) {
+        return notificationRepository.findByToInstaMember_username(username);
+    }
+    public boolean countUnreadNotificationsByToInstaMember(InstaMember instaMember) {
+        return notificationRepository.countByToInstaMemberAndReadDateIsNull(instaMember) > 0;
+    }
     @Transactional
     public void checkNotification(List<Notification> notifications){
         notifications.stream()
                 .forEach(notification -> notification.check());
-
-
     }
     @Transactional
     public RsData<Notification> makeLike(LikeablePerson likeablePerson) {
