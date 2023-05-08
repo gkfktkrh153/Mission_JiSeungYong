@@ -32,9 +32,9 @@
               </label>
               <select name="gender" class="select select-bordered w-full"
                       onchange="$(this).closest('form').submit();">
-                <option value="">전체</option>
-                <option value="M">남성</option>
-                <option value="W">여성</option>
+                <option th:selected="${gender}==''" value="">전체</option>
+                <option th:selected="${gender}=='M'" value="M">남성</option>
+                <option th:selected="${gender}=='W'" value="W">여성</option>
               </select>
               <script>
                 if (params.gender) {
@@ -50,6 +50,7 @@
                                     호감사유
                                 </span>
               </label>
+
               <select name="attractiveTypeCode" class="select select-bordered w-full"
                       onchange="$(this).closest('form').submit();">
                 <option value="">전체</option>
