@@ -100,16 +100,6 @@ public class InstaMemberService {
         toInstaMember.decreaseLikesCount(fromInstaMember.getGender(), oldAttractiveTypeCode);
         toInstaMember.increaseLikesCount(fromInstaMember.getGender(), likeablePerson.getAttractiveTypeCode());
 
-        Notification notification = Notification.builder()
-                .fromInstaMember(likeablePerson.getFromInstaMember())
-                .toInstaMember(likeablePerson.getToInstaMember())
-                .oldAttractiveTypeCode(oldAttractiveTypeCode)
-                .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
-                .typeCode("ModifyLike")
-                .build();
-
-        notificationRepository.save(notification);
-
         InstaMemberSnapshot snapshot = toInstaMember.snapshot("ModifyAttractiveType");
 
         saveSnapshot(snapshot);
@@ -119,15 +109,6 @@ public class InstaMemberService {
         InstaMember fromInstaMember = likeablePerson.getFromInstaMember();
         InstaMember toInstaMember = likeablePerson.getToInstaMember();
 
-        toInstaMember.increaseLikesCount(fromInstaMember.getGender(), likeablePerson.getAttractiveTypeCode());
-        Notification notification = Notification.builder()
-                .fromInstaMember(likeablePerson.getFromInstaMember())
-                .toInstaMember(likeablePerson.getToInstaMember())
-                .newAttractiveTypeCode(likeablePerson.getAttractiveTypeCode())
-                .typeCode("Like")
-                .build();
-
-        notificationRepository.save(notification);
 
         InstaMemberSnapshot snapshot = toInstaMember.snapshot("Like");
 
