@@ -74,12 +74,12 @@
               </label>
               <select name="sortCode" class="select select-bordered w-full"
                       onchange="$(this).closest('form').submit();">
-                <option value="1">최신순</option>
-                <option value="2">날짜순</option>
-                <option value="3">인기 많은 순</option>
-                <option value="4">인기 적은 순</option>
-                <option value="5">성별순</option>
-                <option value="6">호감사유순</option>
+                <option th:selected="${sortCode}=='1'" value="1">최신순</option>
+                <option th:selected="${sortCode}=='2'" value="2">날짜순</option>
+                <option th:selected="${sortCode}=='3'" value="3">인기 많은 순</option>
+                <option th:selected="${sortCode}=='4'" value="4">인기 적은 순</option>
+                <option th:selected="${sortCode}=='5'" value="5">성별순</option>
+                <option th:selected="${sortCode}=='6'" value="6">호감사유순</option>
               </select>
               <script>
                 if (params.sortCode) {
@@ -99,6 +99,7 @@
                 <div>
                   <i class="fa-regular fa-face-laugh-beam"></i>
                   호감표시자
+                  <span th:text="${likeablePerson.getFromInstaMemberUsername()}"></span>
                 </div>
                 <svg th:data-jdenticon-value="|${likeablePerson.jdenticon}|" width="120"
                      height="120"></svg>

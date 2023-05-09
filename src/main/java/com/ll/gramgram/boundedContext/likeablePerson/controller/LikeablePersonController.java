@@ -16,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -136,13 +138,16 @@ public class LikeablePersonController {
                 likeablePeople = likeablePeople.stream().filter(likeablePerson -> likeablePerson.getFromInstaMember().getGender().equals(gender)).collect(Collectors.toList());
             if(!attractiveTypeCode.equals(""))
                 likeablePeople = likeablePeople.stream().filter(likeablePerson -> likeablePerson.getAttractiveTypeCode() == Long.parseLong(attractiveTypeCode)).collect(Collectors.toList());
+            likeablePersonService.order(likeablePeople, sortCode);
 
 
             model.addAttribute("likeablePeople", likeablePeople);
             model.addAttribute("gender", gender);
+            model.addAttribute("sortCode", sortCode);
             model.addAttribute("attractiveTypeCode", attractiveTypeCode);
         }
         return "/usr/likeablePerson/toList";
     }
+
 
 }

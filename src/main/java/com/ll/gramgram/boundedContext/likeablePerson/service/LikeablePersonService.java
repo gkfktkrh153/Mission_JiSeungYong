@@ -7,19 +7,16 @@ import com.ll.gramgram.base.event.EventBeforeCancelLike;
 import com.ll.gramgram.base.rsData.RsData;
 import com.ll.gramgram.boundedContext.instaMember.entity.InstaMember;
 import com.ll.gramgram.boundedContext.instaMember.service.InstaMemberService;
+import com.ll.gramgram.boundedContext.likeablePerson.comparator.*;
 import com.ll.gramgram.boundedContext.likeablePerson.entity.LikeablePerson;
 import com.ll.gramgram.boundedContext.likeablePerson.repository.LikeablePersonRepository;
 import com.ll.gramgram.boundedContext.member.entity.Member;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -221,4 +218,35 @@ public class LikeablePersonService {
 
         return RsData.of("S-1", "호감표시변경이 가능합니다.");
     }
+
+    public List<LikeablePerson> order(List<LikeablePerson> likeablePeople, String sortCode) {
+
+        switch (sortCode)
+            {
+                case "1":
+                    Collections.sort(likeablePeople, new Newest());
+                    break;
+                case "2":
+                    Collections.sort(likeablePeople, new Oldest());
+                    break;
+                case "3":
+                    Collections.sort(likeablePeople, new Popularlity());
+                    break;
+                case "4":
+                    Collections.sort(likeablePeople, new UnPopularlity());
+                    break;
+                case "5":
+                    Collections.sort(likeablePeople, new GenderAndNewest());
+                    break;
+                case "6":
+                    Collections.sort(likeablePeople, new AttractiveTypeAndNewest());
+                    break;
+
+            }
+            return likeablePeople;
+
+    }
+
+
+
 }
