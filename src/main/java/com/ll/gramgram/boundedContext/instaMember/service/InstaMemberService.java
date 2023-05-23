@@ -111,7 +111,7 @@ public class InstaMemberService {
 
 
         InstaMemberSnapshot snapshot = toInstaMember.snapshot("Like");
-
+        toInstaMember.increaseLikesCount(fromInstaMember.getGender(), likeablePerson.getAttractiveTypeCode());
         saveSnapshot(snapshot);
 
         // 알림

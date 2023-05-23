@@ -16,7 +16,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/usr/likeablePerson")
@@ -123,9 +126,28 @@ public class LikeablePersonController {
     }
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/toList")
-    @ResponseBody
-    public String showToList(Model model) {
-        //TODO : showToList 구현해야 함
-        return "usr/likeablePerson/toList 구현해야 함";
+    public String showToList(Model model, @RequestParam(required = false,defaultValue = "") String gender,
+                             @RequestParam(required = false,defaultValue = "") String attractiveTypeCode,@RequestParam(required = false,defaultValue = "") String sortCode) {
+        InstaMember instaMember = rq.getMember().getInstaMember();
+
+        // 인스타인증을 했는지 체크
+        if (instaMember != null) {
+            // 해당 인스타회원이 좋아하는 사람들 목록
+            List<LikeablePerson> likeablePeople = instaMember.getToLikeablePeople();
+            if(!gender.equals(""))
+                likeablePeople = likeablePeople.stream().filter(likeablePerson -> likeablePerson.getFromInstaMember().getGender().equals(gender)).collect(Collectors.toList());
+            if(!attractiveTypeCode.equals(""))
+                likeablePeople = likeablePeople.stream().filter(likeablePerson -> likeablePerson.getAttractiveTypeCode() == Long.parseLong(attractiveTypeCode)).collect(Collectors.toList());
+            likeablePersonService.order(likeablePeople, sortCode);
+
+
+            model.addAttribute("likeablePeople", likeablePeople);
+            model.addAttribute("gender", gender);
+            model.addAttribute("sortCode", sortCode);
+            model.addAttribute("attractiveTypeCode", attractiveTypeCode);
+        }
+        return "/usr/likeablePerson/toList";
     }
+
+
 }

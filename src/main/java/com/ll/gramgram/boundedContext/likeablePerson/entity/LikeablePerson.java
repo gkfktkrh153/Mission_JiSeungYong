@@ -15,13 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Entity
 @Getter
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-public class LikeablePerson extends BaseEntity {
+public class LikeablePerson extends BaseEntity{
     private LocalDateTime modifyUnlockDate;
 
     @ManyToOne
